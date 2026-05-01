@@ -63,6 +63,7 @@ chmod +x run_workflow.sh
 
 **Windows (PowerShell):**
 ```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 .\run_workflow.ps1
 ```
 
@@ -89,9 +90,10 @@ chmod +x run_workflow.sh
 ├── run_workflow.sh                Pipeline entry point (Bash)
 ├── run_workflow.ps1               Pipeline entry point (PowerShell)
 │
-├── assign_ss.smk                  Stage 1: Secondary structure assignment
-├── build_contexts.smk             Stage 2: Tripeptide window extraction
-├── compute_angles.smk             Stage 3: Angle calculation
+├── smk_command/                   Snakemake workflow definitions
+│   ├── assign_ss.smk              Stage 1: Secondary structure assignment
+│   ├── build_contexts.smk         Stage 2: Tripeptide window extraction
+│   └── compute_angles.smk         Stage 3: Angle calculation
 │
 ├── analysis_scripts/              Analysis modules
 │   ├── parse_secondary_structure.py     STRIDE output parser
@@ -115,7 +117,7 @@ chmod +x run_workflow.sh
 
 The analysis is divided into four sequential stages:
 
-### Stage 1: Secondary Structure Assignment
+##Workflow:** `smk_command/assign_ss.smk`  
 **Input:** PDB structures (.pdb.gz)  
 **Tool:** STRIDE  
 **Output:** Secondary structure annotations
@@ -127,8 +129,9 @@ For each PDB file:
 4. Clean up temporary files
 
 ### Stage 2: Tripeptide Context Extraction
+**Workflow:** `smk_command/build_contexts.smk`  
 **Input:** STRIDE annotations  
-**Script:** `parse_secondary_structure.py`  
+**Script:** `analysis_scripts/parse_secondary_structure.py`  
 **Output:** Tripeptide windows (TSV format)
 
 For each PDB's STRIDE output:
@@ -143,7 +146,9 @@ Each output TSV contains three rows per tripeptide with 14 fields:
 - **Context:** single-letter code, helix sequence, helix SS pattern, PDB ID, positions
 
 ### Stage 3: Angle Computation
+**Workflow:** `smk_command/compute_angles.smk`  
 **Input:** Tripeptide windows + PDB coordinates  
+**Script:** `analysis_scripts/ipeptide windows + PDB coordinates  
 **Script:** `compute_orientation_angles.py`  
 **Output:** Angle measurements (TSV format)
 
@@ -166,10 +171,10 @@ Angle:
   θ = arctan2((sc_prev × sc_cent) · axis, sc_prev · sc_cent)
 ```
 Angle range: −180° to +180°. Positive indicates counter-clockwise rotation when viewed from prev toward ARG along helix axis.
-
+analysis_scripts/
 ### Stage 4: Visualization
 **Input:** Angle measurements (TSV)  
-**Script:** `create_density_plot.R`  
+**Script:** `analysis_scripts/create_density_plot.R`  
 **Output:** Density plot (PNG)
 
 Generate publication-quality density plot:
@@ -286,13 +291,13 @@ Increase the number of cores:
 ./run_workflow.sh --cores 32
 ```
 
-### Dry Run (No Execution)
-Validate workflow without running:
-```bash
-snakemake -s assign_ss.smk --dry-run
+### Dry Run (smk_command/assign_ss.smk --dry-run
 ```
 
 ### Generate Workflow DAG
+Visualize pipeline structure:
+```bash
+snakemake -s smk_command/Workflow DAG
 Visualize pipeline structure:
 ```bash
 snakemake -s assign_ss.smk --dag | dot -Tpng > dag.png

@@ -10,13 +10,13 @@ $env:PROTEIN_DIR = $PROTEIN_DIR
 $env:SS_PREDICTOR_BINARY = $SS_PREDICTOR_BINARY
 
 Write-Host " PDB to STRIDE" -ForegroundColor Cyan
-snakemake -s assign_ss.smk --cores $CORES --keep-going
+snakemake -s smk_command/assign_ss.smk --cores $CORES --keep-going
 
 Write-Host "STRIDE to Contexts" -ForegroundColor Cyan
-snakemake -s build_contexts.smk --cores $CORES --keep-going
+snakemake -s smk_command/build_contexts.smk --cores $CORES --keep-going
 
 Write-Host "Contexts to Angle list" -ForegroundColor Cyan
-snakemake -s compute_angles.smk --cores $CORES --keep-going
+snakemake -s smk_command/smk_command/compute_angles.smk --cores $CORES --keep-going
 
 Write-Host "Plot" -ForegroundColor Cyan
 $RscriptPath = "C:\Program Files\R\R-4.6.0\bin\Rscript.exe"
